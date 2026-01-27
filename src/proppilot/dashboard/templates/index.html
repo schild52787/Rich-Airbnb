@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block heading %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="grid">
+    <div class="card">
+        <h2>Properties ({{ properties|length }})</h2>
+        <ul class="property-list">
+        {% for prop in properties %}
+            <li>
+                <strong>{{ prop.name }}</strong>
+                <span class="muted">{{ prop.address }}</span>
+                <span class="badge">${{ "%.0f"|format(prop.base_price) }}/night</span>
+            </li>
+        {% else %}
+            <li class="muted">No properties configured. Update config.yaml.</li>
+        {% endfor %}
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2>Active Guests</h2>
+        {% for booking in active_bookings %}
+        <div class="booking-card active">
+            <strong>{{ booking.guest_name or "Guest" }}</strong>
+            <span>{{ booking.prop.name }}</span>
+            <span class="muted">Until {{ booking.checkout_date.strftime('%b %d') }}</span>
+        </div>
+        {% else %}
+        <p class="muted">No guests currently checked in.</p>
+        {% endfor %}
+    </div>
+
+    <div class="card">
+        <h2>Upcoming Bookings</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Guest</th>
+                    <th>Property</th>
+                    <th>Check-in</th>
+                    <th>Nights</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for booking in upcoming_bookings %}
+                <tr>
+                    <td>{{ booking.guest_name or "—" }}</td>
+                    <td>{{ booking.prop.name }}</td>
+                    <td>{{ booking.checkin_date.strftime('%b %d') }}</td>
+                    <td>{{ booking.nights }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="4" class="muted">No upcoming bookings.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h2>Pending Tasks</h2>
+        {% for task in pending_tasks %}
+        <div class="task-item {% if task.priority == 'high' %}high-priority{% endif %}">
+            <span>{{ task.prop.name }} - {{ task.scheduled_date.strftime('%b %d') }}</span>
+            {% if task.is_turnover %}<span class="badge warning">Turnover</span>{% endif %}
+            <span class="badge">{{ task.status }}</span>
+        </div>
+        {% else %}
+        <p class="muted">No pending cleaning tasks.</p>
+        {% endfor %}
+    </div>
+
+    <div class="card">
+        <h2>Queued Messages</h2>
+        {% for msg in pending_messages %}
+        <div class="message-item">
+            <strong>{{ msg.template_name }}</strong>
+            <span class="muted">{{ msg.recipient }}</span>
+            <span class="badge">{{ msg.channel }}</span>
+        </div>
+        {% else %}
+        <p class="muted">No messages queued.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

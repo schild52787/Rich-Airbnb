@@ -1,0 +1,8 @@
+Hi {{ guest_name }},
+
+Welcome! We're excited to host you at {{ property_name }}.
+Your stay is confirmed from {{ checkin_date }} to {{ checkout_date }} ({{ nights }} nights).
+
+I'll send check-in instructions closer to your arrival date.
+
+Let me know if you have any questions!

@@ -1,0 +1,12 @@
+Hi {{ guest_name }},
+
+Here are your check-in details for {{ property_name }}:
+
+Address: {{ address }}
+Check-in time: {{ checkin_time }}
+Lockbox code: {{ lockbox_code }}
+WiFi password: {{ wifi_password }}
+
+{{ notes }}
+
+Enjoy your stay!

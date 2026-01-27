@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Bookings{% endblock %}
+{% block heading %}Bookings{% endblock %}
+
+{% block content %}
+<div class="filters">
+    <form method="get">
+        <select name="property_id" onchange="this.form.submit()">
+            <option value="">All Properties</option>
+            {% for prop in properties %}
+            <option value="{{ prop.id }}" {% if selected_property_id == prop.id %}selected{% endif %}>
+                {{ prop.name }}
+            </option>
+            {% endfor %}
+        </select>
+    </form>
+</div>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Guest</th>
+            <th>Property</th>
+            <th>Confirmation</th>
+            <th>Check-in</th>
+            <th>Check-out</th>
+            <th>Nights</th>
+            <th>Payout</th>
+            <th>Status</th>
+            <th>Source</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for booking in bookings %}
+        <tr class="{% if booking.status == 'cancelled' %}cancelled{% endif %}">
+            <td>{{ booking.guest_name or "—" }}</td>
+            <td>{{ booking.prop.name }}</td>
+            <td>{{ booking.confirmation_code or "—" }}</td>
+            <td>{{ booking.checkin_date.strftime('%Y-%m-%d') }}</td>
+            <td>{{ booking.checkout_date.strftime('%Y-%m-%d') }}</td>
+            <td>{{ booking.nights }}</td>
+            <td>{% if booking.total_payout %}${{ "%.2f"|format(booking.total_payout) }}{% else %}—{% endif %}</td>
+            <td><span class="badge {{ booking.status }}">{{ booking.status }}</span></td>
+            <td>{{ booking.source }}</td>
+        </tr>
+    {% else %}
+        <tr><td colspan="9" class="muted">No bookings found.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

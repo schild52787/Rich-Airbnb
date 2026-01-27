@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block title %}Financial{% endblock %}
+{% block heading %}Financial Reports{% endblock %}
+
+{% block content %}
+<div class="filters">
+    <form method="get">
+        <select name="property_id" onchange="this.form.submit()">
+            {% for prop in properties %}
+            <option value="{{ prop.id }}" {% if selected_property_id == prop.id %}selected{% endif %}>
+                {{ prop.name }}
+            </option>
+            {% endfor %}
+        </select>
+        <input type="number" name="year" value="{{ year }}" min="2020" max="2030" onchange="this.form.submit()">
+        <select name="month" onchange="this.form.submit()">
+            {% for m in range(1, 13) %}
+            <option value="{{ m }}" {% if month == m %}selected{% endif %}>
+                {{ ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m-1] }}
+            </option>
+            {% endfor %}
+        </select>
+    </form>
+</div>
+
+{% if report %}
+<div class="grid">
+    <div class="card summary-card">
+        <h3>{{ report.property_name }} - {{ ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][report.month-1] }} {{ report.year }}</h3>
+        <div class="summary-numbers">
+            <div class="stat positive">
+                <span class="label">Income</span>
+                <span class="value">${{ "%.2f"|format(report.total_income) }}</span>
+                <span class="detail">{{ report.num_payouts }} payouts</span>
+            </div>
+            <div class="stat negative">
+                <span class="label">Expenses</span>
+                <span class="value">${{ "%.2f"|format(report.total_expenses) }}</span>
+            </div>
+            <div class="stat {% if report.net_income >= 0 %}positive{% else %}negative{% endif %}">
+                <span class="label">Net Income</span>
+                <span class="value">${{ "%.2f"|format(report.net_income) }}</span>
+            </div>
+        </div>
+    </div>
+
+    {% if report.expenses_by_category %}
+    <div class="card">
+        <h3>Expenses by Category</h3>
+        <table>
+            <thead><tr><th>Category</th><th>Amount</th></tr></thead>
+            <tbody>
+            {% for cat, amt in report.expenses_by_category.items() %}
+                <tr>
+                    <td>{{ cat.replace('_', ' ').title() }}</td>
+                    <td>${{ "%.2f"|format(amt) }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+
+{% if annual_report %}
+<div class="card">
+    <h3>{{ annual_report.year }} Annual Summary</h3>
+    <div class="summary-numbers">
+        <div class="stat positive">
+            <span class="label">Total Income</span>
+            <span class="value">${{ "%.2f"|format(annual_report.total_income) }}</span>
+        </div>
+        <div class="stat negative">
+            <span class="label">Total Expenses</span>
+            <span class="value">${{ "%.2f"|format(annual_report.total_expenses) }}</span>
+        </div>
+        <div class="stat {% if annual_report.net_income >= 0 %}positive{% else %}negative{% endif %}">
+            <span class="label">Net Income</span>
+            <span class="value">${{ "%.2f"|format(annual_report.net_income) }}</span>
+        </div>
+    </div>
+    <div class="export-links">
+        <a href="/financial/export/expenses?property_id={{ selected_property_id }}&year={{ year }}" class="btn">Export Expenses CSV</a>
+        <a href="/financial/export/income?property_id={{ selected_property_id }}&year={{ year }}" class="btn">Export Income CSV</a>
+    </div>
+</div>
+{% endif %}
+{% endif %}
+
+<div class="grid">
+    <div class="card">
+        <h3>Add Expense</h3>
+        <form method="post" action="/financial/expense">
+            <input type="hidden" name="property_id" value="{{ selected_property_id }}">
+            <div class="form-group">
+                <label>Category</label>
+                <select name="category" required>
+                    {% for cat in categories %}
+                    <option value="{{ cat }}">{{ cat.replace('_', ' ').title() }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <input type="text" name="description" required>
+            </div>
+            <div class="form-group">
+                <label>Amount ($)</label>
+                <input type="number" name="amount" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label>Date</label>
+                <input type="date" name="expense_date" required>
+            </div>
+            <div class="form-group">
+                <label>Vendor</label>
+                <input type="text" name="vendor">
+            </div>
+            <button type="submit" class="btn">Add Expense</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h3>Add Payout</h3>
+        <form method="post" action="/financial/payout">
+            <input type="hidden" name="property_id" value="{{ selected_property_id }}">
+            <div class="form-group">
+                <label>Amount ($)</label>
+                <input type="number" name="amount" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label>Date</label>
+                <input type="date" name="payout_date" required>
+            </div>
+            <div class="form-group">
+                <label>Confirmation Code</label>
+                <input type="text" name="confirmation_code">
+            </div>
+            <div class="form-group">
+                <label>Notes</label>
+                <input type="text" name="notes">
+            </div>
+            <button type="submit" class="btn">Add Payout</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

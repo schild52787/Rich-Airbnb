@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PropPilot - {% block title %}Dashboard{% endblock %}</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="logo">PropPilot</div>
+        <ul>
+            <li><a href="/" class="{% if request.url.path == '/' %}active{% endif %}">Dashboard</a></li>
+            <li><a href="/bookings" class="{% if '/bookings' in request.url.path %}active{% endif %}">Bookings</a></li>
+            <li><a href="/cleaning" class="{% if '/cleaning' in request.url.path %}active{% endif %}">Cleaning</a></li>
+            <li><a href="/messages" class="{% if '/messages' in request.url.path %}active{% endif %}">Messages</a></li>
+            <li><a href="/pricing" class="{% if '/pricing' in request.url.path %}active{% endif %}">Pricing</a></li>
+            <li><a href="/financial" class="{% if '/financial' in request.url.path %}active{% endif %}">Financial</a></li>
+            <li><a href="/maintenance" class="{% if '/maintenance' in request.url.path %}active{% endif %}">Maintenance</a></li>
+            <li><a href="/inventory" class="{% if '/inventory' in request.url.path %}active{% endif %}">Inventory</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <form method="post" action="/sync">
+                <button type="submit" class="btn btn-sm">Sync Calendars</button>
+            </form>
+        </div>
+    </nav>
+    <main class="content">
+        <header>
+            <h1>{% block heading %}Dashboard{% endblock %}</h1>
+        </header>
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

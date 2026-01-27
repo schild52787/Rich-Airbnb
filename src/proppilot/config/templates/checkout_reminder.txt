@@ -1,0 +1,10 @@
+Hi {{ guest_name }},
+
+Just a friendly reminder that checkout is tomorrow at {{ checkout_time }}.
+
+Before you leave, please:
+- Start the dishwasher if there are dishes
+- Take out any trash
+- Lock the door behind you
+
+We hope you enjoyed your stay at {{ property_name }}!

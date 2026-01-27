@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Cleaning{% endblock %}
+{% block heading %}Cleaning Tasks{% endblock %}
+
+{% block content %}
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Property</th>
+            <th>Date</th>
+            <th>Priority</th>
+            <th>Turnover</th>
+            <th>Notified</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for task in tasks %}
+        <tr class="{% if task.priority == 'high' %}high-priority{% endif %}">
+            <td>{{ prop_map.get(task.property_id, "Unknown") }}</td>
+            <td>{{ task.scheduled_date.strftime('%Y-%m-%d (%A)') }}</td>
+            <td><span class="badge {{ task.priority }}">{{ task.priority }}</span></td>
+            <td>{% if task.is_turnover %}Yes{% else %}No{% endif %}</td>
+            <td>{% if task.cleaner_notified %}{{ task.cleaner_notified_at.strftime('%m/%d %H:%M') if task.cleaner_notified_at else "Yes" }}{% else %}No{% endif %}</td>
+            <td><span class="badge {{ task.status }}">{{ task.status }}</span></td>
+            <td>
+                {% if task.status in ('pending', 'notified') %}
+                <form method="post" action="/cleaning/{{ task.id }}/complete" style="display:inline">
+                    <button type="submit" class="btn btn-sm">Complete</button>
+                </form>
+                {% elif task.status == 'completed' %}
+                Done
+                {% else %}
+                —
+                {% endif %}
+            </td>
+        </tr>
+    {% else %}
+        <tr><td colspan="7" class="muted">No cleaning tasks.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

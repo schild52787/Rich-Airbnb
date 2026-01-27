@@ -1,0 +1,7 @@
+Hi {{ guest_name }},
+
+Thank you for staying at {{ property_name }}! We hope you had a wonderful time.
+
+If you have a moment, we'd really appreciate a review of your stay. Your feedback helps us improve and helps future guests.
+
+Thanks again, and we hope to host you again!

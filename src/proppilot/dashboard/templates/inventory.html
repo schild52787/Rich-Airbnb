@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Inventory{% endblock %}
+{% block heading %}Supply Inventory{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h3>Add Item</h3>
+    <form method="post" action="/inventory" class="inline-form">
+        <select name="property_id" required>
+            {% for prop in properties %}
+            <option value="{{ prop.id }}">{{ prop.name }}</option>
+            {% endfor %}
+        </select>
+        <input type="text" name="name" placeholder="Item name" required>
+        <input type="number" name="quantity" placeholder="Qty" value="0" min="0">
+        <input type="number" name="reorder_threshold" placeholder="Reorder at" value="2" min="0">
+        <input type="number" name="unit_cost" placeholder="Unit cost" step="0.01">
+        <button type="submit" class="btn">Add</button>
+    </form>
+</div>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Property</th>
+            <th>Item</th>
+            <th>Quantity</th>
+            <th>Reorder At</th>
+            <th>Unit Cost</th>
+            <th>Status</th>
+            <th>Update</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for item in items %}
+        <tr class="{% if item.needs_reorder %}reorder-alert{% endif %}">
+            <td>{{ prop_map.get(item.property_id, "Unknown") }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.reorder_threshold }}</td>
+            <td>{% if item.unit_cost %}${{ "%.2f"|format(item.unit_cost) }}{% else %}—{% endif %}</td>
+            <td>
+                {% if item.needs_reorder %}
+                <span class="badge warning">Reorder</span>
+                {% else %}
+                <span class="badge">OK</span>
+                {% endif %}
+            </td>
+            <td>
+                <form method="post" action="/inventory/{{ item.id }}/update" class="inline-form">
+                    <input type="number" name="quantity" value="{{ item.quantity }}" min="0" style="width:60px">
+                    <button type="submit" class="btn btn-sm">Set</button>
+                </form>
+            </td>
+        </tr>
+    {% else %}
+        <tr><td colspan="7" class="muted">No inventory items.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

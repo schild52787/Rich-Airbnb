@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Maintenance{% endblock %}
+{% block heading %}Maintenance Tasks{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h3>New Maintenance Task</h3>
+    <form method="post" action="/maintenance" class="inline-form">
+        <select name="property_id" required>
+            {% for prop in properties %}
+            <option value="{{ prop.id }}">{{ prop.name }}</option>
+            {% endfor %}
+        </select>
+        <input type="text" name="title" placeholder="Task title" required>
+        <input type="text" name="description" placeholder="Description">
+        <select name="priority">
+            <option value="low">Low</option>
+            <option value="normal" selected>Normal</option>
+            <option value="high">High</option>
+            <option value="urgent">Urgent</option>
+        </select>
+        <input type="number" name="cost" placeholder="Est. cost" step="0.01">
+        <button type="submit" class="btn">Add</button>
+    </form>
+</div>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Property</th>
+            <th>Task</th>
+            <th>Description</th>
+            <th>Priority</th>
+            <th>Cost</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for task in tasks %}
+        <tr class="{% if task.priority == 'urgent' %}high-priority{% endif %}">
+            <td>{{ prop_map.get(task.property_id, "Unknown") }}</td>
+            <td>{{ task.title }}</td>
+            <td>{{ task.description or "—" }}</td>
+            <td><span class="badge {{ task.priority }}">{{ task.priority }}</span></td>
+            <td>{% if task.cost %}${{ "%.2f"|format(task.cost) }}{% else %}—{% endif %}</td>
+            <td><span class="badge {{ task.status }}">{{ task.status }}</span></td>
+            <td>
+                {% if task.status != 'completed' %}
+                <form method="post" action="/maintenance/{{ task.id }}/complete" style="display:inline">
+                    <button type="submit" class="btn btn-sm">Complete</button>
+                </form>
+                {% else %}
+                {{ task.completed_at.strftime('%m/%d') if task.completed_at else "Done" }}
+                {% endif %}
+            </td>
+        </tr>
+    {% else %}
+        <tr><td colspan="7" class="muted">No maintenance tasks.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

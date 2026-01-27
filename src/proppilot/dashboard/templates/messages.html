@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Messages{% endblock %}
+{% block heading %}Guest Messages{% endblock %}
+
+{% block content %}
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Template</th>
+            <th>Recipient</th>
+            <th>Channel</th>
+            <th>Subject</th>
+            <th>Status</th>
+            <th>Scheduled</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for msg in messages %}
+        <tr>
+            <td>{{ msg.template_name or "Custom" }}</td>
+            <td>{{ msg.recipient or "—" }}</td>
+            <td>{{ msg.channel }}</td>
+            <td>{{ msg.subject or "—" }}</td>
+            <td><span class="badge {{ msg.status }}">{{ msg.status }}</span></td>
+            <td>{{ msg.scheduled_at.strftime('%Y-%m-%d %H:%M') if msg.scheduled_at else "—" }}</td>
+            <td>
+                {% if msg.status == 'queued' and msg.channel == 'airbnb' %}
+                <details>
+                    <summary class="btn btn-sm">View & Copy</summary>
+                    <div class="message-body">
+                        <pre>{{ msg.body }}</pre>
+                        <form method="post" action="/messages/{{ msg.id }}/mark-copied">
+                            <button type="submit" class="btn">Mark as Sent</button>
+                        </form>
+                    </div>
+                </details>
+                {% elif msg.status == 'copied' or msg.status == 'sent' %}
+                {{ msg.sent_at.strftime('%m/%d %H:%M') if msg.sent_at else "Sent" }}
+                {% else %}
+                —
+                {% endif %}
+            </td>
+        </tr>
+    {% else %}
+        <tr><td colspan="7" class="muted">No messages.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
