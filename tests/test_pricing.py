@@ -76,3 +76,63 @@ def test_high_season_multiplier():
     rec = engine._calculate_price(prop, date(2026, 7, 1), {}, [], set())
     assert any("High season" in adj for adj in rec.adjustments)
     assert rec.recommended_price > 100.0
+
+
+def test_low_season_discount():
+    engine = PricingEngine()
+    prop = Property(
+        id=1, name="Test", address="123 Test", base_price=100.0,
+        bedrooms=1, max_guests=4, checkout_time="11:00", checkin_time="15:00",
+    )
+
+    # January is low season (month 1 in config)
+    # Use a Wednesday to avoid weekend multiplier
+    rec = engine._calculate_price(prop, date(2026, 1, 7), {}, [], set())
+    assert any("Low season" in adj for adj in rec.adjustments)
+    assert rec.recommended_price < 100.0
+
+
+def test_custom_rule_applied():
+    engine = PricingEngine()
+    prop = Property(
+        id=1, name="Test", address="123 Test", base_price=100.0,
+        bedrooms=1, max_guests=4, checkout_time="11:00", checkin_time="15:00",
+    )
+
+    # Custom rule: 50% premium for a specific date range
+    rule = PricingRule(
+        id=1, property_id=1, rule_type="event", name="Music Festival",
+        multiplier=1.50, start_date=date(2026, 6, 1), end_date=date(2026, 6, 7),
+        is_active=True,
+    )
+
+    # Date within rule range (Wednesday June 3)
+    rec = engine._calculate_price(prop, date(2026, 6, 3), {}, [rule], set())
+    assert any("Music Festival" in adj for adj in rec.adjustments)
+    assert rec.recommended_price > 100.0
+
+    # Date outside rule range should not apply
+    rec2 = engine._calculate_price(prop, date(2026, 6, 10), {}, [rule], set())
+    assert not any("Music Festival" in adj for adj in rec2.adjustments)
+
+
+def test_custom_rule_day_of_week_filter():
+    engine = PricingEngine()
+    prop = Property(
+        id=1, name="Test", address="123 Test", base_price=100.0,
+        bedrooms=1, max_guests=4, checkout_time="11:00", checkin_time="15:00",
+    )
+
+    # Rule only for Fridays (weekday=4) and Saturdays (weekday=5)
+    rule = PricingRule(
+        id=1, property_id=1, rule_type="day_of_week", name="Weekend Special",
+        multiplier=1.20, days_of_week="4,5", is_active=True,
+    )
+
+    # Wednesday should not match
+    rec_wed = engine._calculate_price(prop, date(2026, 1, 7), {}, [rule], set())
+    assert not any("Weekend Special" in adj for adj in rec_wed.adjustments)
+
+    # Friday should match
+    rec_fri = engine._calculate_price(prop, date(2026, 1, 9), {}, [rule], set())
+    assert any("Weekend Special" in adj for adj in rec_fri.adjustments)

@@ -53,7 +53,7 @@ class CalendarSyncer:
         """Sync a single property by ID."""
         session = get_session()
         try:
-            prop = session.query(Property).get(property_id)
+            prop = session.get(Property, property_id)
             if prop and prop.ical_url:
                 self._sync_property(session, prop)
         finally:

@@ -39,7 +39,7 @@ class PricingEngine:
         """Get price recommendations for a date range."""
         session = get_session()
         try:
-            prop = session.query(Property).get(property_id)
+            prop = session.get(Property, property_id)
             if not prop:
                 return []
 

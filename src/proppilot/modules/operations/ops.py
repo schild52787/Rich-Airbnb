@@ -61,7 +61,7 @@ class OperationsManager:
         """Create a cleaning task for a booking's checkout date."""
         session = get_session()
         try:
-            booking = session.query(Booking).get(booking_id)
+            booking = session.get(Booking, booking_id)
             if not booking:
                 return None
 
@@ -139,7 +139,7 @@ class OperationsManager:
             )
 
             for task in tasks:
-                prop = session.query(Property).get(task.property_id)
+                prop = session.get(Property, task.property_id)
                 if not prop or not prop.cleaner_phone:
                     continue
 
@@ -169,7 +169,7 @@ class OperationsManager:
                 .all()
             )
             for task in tasks:
-                prop = session.query(Property).get(task.property_id)
+                prop = session.get(Property, task.property_id)
                 if not prop or not prop.cleaner_phone:
                     continue
 
@@ -252,7 +252,7 @@ class OperationsManager:
     def complete_maintenance_task(self, task_id: int, cost: float | None = None) -> None:
         session = get_session()
         try:
-            task = session.query(MaintenanceTask).get(task_id)
+            task = session.get(MaintenanceTask, task_id)
             if task:
                 task.status = "completed"
                 task.completed_at = datetime.now(timezone.utc)
@@ -276,7 +276,7 @@ class OperationsManager:
     def update_inventory(self, item_id: int, quantity: int) -> None:
         session = get_session()
         try:
-            item = session.query(InventoryItem).get(item_id)
+            item = session.get(InventoryItem, item_id)
             if item:
                 item.quantity = quantity
                 session.commit()

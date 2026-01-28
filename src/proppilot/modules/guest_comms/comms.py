@@ -54,12 +54,12 @@ class GuestCommunicator:
         """Render a template and queue it for delivery."""
         session = get_session()
         try:
-            booking = session.query(Booking).get(booking_id)
+            booking = session.get(Booking, booking_id)
             if not booking:
                 logger.warning("Booking %s not found, skipping message", booking_id)
                 return None
 
-            prop = session.query(Property).get(booking.property_id)
+            prop = session.get(Property, booking.property_id)
             if not prop:
                 return None
 

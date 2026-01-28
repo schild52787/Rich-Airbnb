@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 
 from sqlalchemy import Boolean, Date, DateTime, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
@@ -42,7 +42,7 @@ class Expense(Base):
     is_recurring: Mapped[bool] = mapped_column(Boolean, default=False)
     recurrence_months: Mapped[int | None] = mapped_column(Integer, nullable=True)  # Every N months
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     def __repr__(self) -> str:
         return f"<Expense id={self.id} {self.category} ${self.amount:.2f}>"

@@ -116,7 +116,7 @@ class FinancialTracker:
         """Generate a monthly financial report for a property."""
         session = get_session()
         try:
-            prop = session.query(Property).get(property_id)
+            prop = session.get(Property, property_id)
             prop_name = prop.name if prop else f"Property {property_id}"
 
             # Income

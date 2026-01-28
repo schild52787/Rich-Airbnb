@@ -260,7 +260,7 @@ async def complete_cleaning_task(task_id: int):
     """Mark a cleaning task as completed."""
     session = get_session()
     try:
-        task = session.query(CleaningTask).get(task_id)
+        task = session.get(CleaningTask, task_id)
         if task:
             task.status = "completed"
             task.completed_at = datetime.now(timezone.utc)
@@ -294,7 +294,7 @@ async def mark_message_copied(message_id: int):
     """Mark a message as copied (host sent it manually)."""
     session = get_session()
     try:
-        msg = session.query(MessageLog).get(message_id)
+        msg = session.get(MessageLog, message_id)
         if msg:
             msg.status = "copied"
             msg.sent_at = datetime.now(timezone.utc)

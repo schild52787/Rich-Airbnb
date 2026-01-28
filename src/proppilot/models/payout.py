@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 
 from sqlalchemy import Date, DateTime, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -21,7 +21,7 @@ class Payout(Base):
     confirmation_code: Mapped[str | None] = mapped_column(String(50), nullable=True)
     source: Mapped[str] = mapped_column(String(50), default="email")  # email, manual
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     booking: Mapped["Booking | None"] = relationship(back_populates="payouts")  # noqa: F821
 
@@ -41,4 +41,4 @@ class EmailProcessingLog(Base):
     parsed_data: Mapped[str | None] = mapped_column(Text, nullable=True)  # JSON blob
     status: Mapped[str] = mapped_column(String(50), default="processed")  # processed, unrecognized, error
     error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
-    processed_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    processed_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
